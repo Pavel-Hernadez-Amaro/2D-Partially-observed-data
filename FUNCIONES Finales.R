@@ -2469,7 +2469,7 @@ B2XZG_1d_2_var_intercept <-function (B, pord=c(2,2),c=c(20,20)) {
 
 # THIS FUNCTION FIT THE MODEL USING OUR APPROACH 
 # AND RECOVER THE ORIGINAL THETA COEFFICIENTS THAT ARE NECESSARY FOR CALCULATE THE ESTIMATED FUNCTIONAL COEFFICIENT BETA FOR THE 2D CASE.
-XZG2theta=function(X, Z, G, T, y, family=gaussian(), offset = NULL){
+XZG2theta=function(X, Z, G, T, y, family=gaussian(), weights = w, offset = NULL){
   require(SOP)
   
   if (dim(X)[1]!=dim(Z)[1]) {
@@ -2480,7 +2480,9 @@ XZG2theta=function(X, Z, G, T, y, family=gaussian(), offset = NULL){
   #   stop("The number of columns of 'Z' must be equal to the length of 'G'")
   # }
   
+  if (is.null(w)) {
   w = as.vector(rep(1,dim(X)[1]))
+  }
   
   fit=sop.fit(X = X, Z = Z, G = G, 
               y = y, family = family,

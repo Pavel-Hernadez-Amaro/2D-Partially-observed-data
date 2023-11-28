@@ -44,6 +44,8 @@ m=2*sub
 
 W_delta=array(dim = (n+1)*(m+1))
 
+miss_points=vector(mode="list", length = N)
+
 model=aux_B=list()
 
 Inner_matrix=array(dim = c(N*c1*c2,c1_beta*c2_beta))
@@ -187,51 +189,36 @@ for (ind in 1:R) {
     }
     
     
-    miss_points=miss_zones=vector(mode="list", length = ncol(Real_X[[ind]][[j]]))
-    #array(,dim = c(nrow(Real_X[[ind]][[j]]),))
+    miss_points[[j]]=vector(mode="list", length = ncol(Real_X[[ind]][[j]]))
     
     for (i in 1:ncol(Real_X[[ind]][[j]])) {
       
-      miss_rows=miss_spots=NULL
-      tag=rep(0,2)  
-      # print(c("i = ", i))
+      miss_spots=NULL
       
       for (j_row in 1:nrow(Real_X[[ind]][[j]])) {
         
-        if (j_row %in% tag[1]:tag[2]) {next}
-        
-        # print(c("j_col = ", j_col))
-        # print(c("miss_columns = ", miss_columns))
-        
         if (is.na(Real_X[[ind]][[j]][j_row,i])) {
           
-          aux=j_row
-          tag[1]=j_row
-          while (is.na(Real_X[[ind]][[j]][aux,i])==TRUE) {
-            
-            tag[2]=aux
-            aux=aux+1
-            
-            if (aux>nrow(Real_X[[ind]][[j]])) {
-              break
-            }
-          }
-          
-          if (tag[1]!=tag[2]) {
-            miss_rows=c(miss_rows,tag)  
-          }else{
-            miss_spots=c(miss_spots,tag[1])
-          }
+            miss_spots=c(miss_spots,j_row)
           
         }
         
       }
       
-      miss_zones[[i]]=miss_rows
-      miss_points[[i]]=miss_spots
+      if (!is.null(miss_spots)) {
+
+        miss_points[[j]][[i]]=miss_spots
+        
+      }
+      
     }
+  }
+  
+  for (ind_miss_points in 1:N) {
     
-    
+    if (length(miss_points[[ind_miss_points]])!=ncol(Real_X[[ind]][[j]])) {
+      stop(c("Revisa que el length de miss point en ", ind_miss_points, "sea", ncol(Real_X[[ind]][[j]])),call. = FALSE)
+    }
     
   }
   
@@ -355,10 +342,6 @@ for (ind in 1:R) {
     
     # HERE BEGINS THE DOUBLE INTEGRAL
     
-    # I_x=kronecker(fy,fx)
-    # I_beta=kronecker(fy_beta,fx_beta)
-    
-    
     for (int_i in 1:length(y)) {
       
       na_x=NULL
@@ -369,39 +352,112 @@ for (ind in 1:R) {
         stop("length(y) has to be equal to m+1",call.=FALSE)
       }
       
-      if (max(which(y[int_i]>=y_observations))<=length(miss_zones) & length(miss_zones)==ncol(Real_X[[ind]][[j]])) {
-        
-        if (max(which(y[int_i]>=y_observations))!=y_b && (isempty(miss_zones[[max(which(y[int_i]>=y_observations))]]) || isempty(miss_zones[[max(which(y[int_i]>=y_observations))+1]]))) {
-          
-          na_22=NULL
-          
-        }else{
-          
-          # tag_y=miss_zones[[max(which(y[int_i]>=y_observations))]]
-          
-          na_22=miss_zones[[max(which(y[int_i]>=y_observations))]]
-          
-        }}else{
-          
-          na_22=NULL
-        }
+      prev_obs=max(which(y[int_i]>=y_observations))
       
-      if (any(y[int_i]==y_observations) & length(miss_zones)==ncol(Real_X[[ind]][[j]])) { #REVISARRRRRRRRRRRRRRRRRRRRRRRRRR
+      next_obs=min(which(y[int_i]<=y_observations))
+      
+      na_22=unique(append(miss_points[[j]][[prev_obs]],miss_points[[j]][[next_obs]]))
+      
+      observed_points=which(!seq(1:nrow(Real_X[[ind]][[j]])) %in% na_22)
+      
+      for (aux_o in observed_points) {
         
-        na_22=miss_zones[[which(y[int_i]==y_observations)]]
+        aux_prev=aux_o-1
+        aux_next=aux_o+1
+        
+        if ((aux_prev %in% na_22) && (aux_next %in% na_22)) {
+          
+          na_22=sort(c(na_22,aux_o))
+          observed_points=observed_points[-which(aux_o==observed_points)]
+        }
         
       }
       
-      if (!isempty(na_22)) {
+      where_diff=which(diff(observed_points) !=1)
+      
+      if (!isempty(where_diff)) {
+      
+      observed_points_final=NULL
+      
+      observed_points_1=range(observed_points[1:where_diff[1]])
+      
+      if (length(where_diff)>1) {
+      
+      for (aux_diff in seq(length(where_diff)-1)) {
         
-        for(tag_x in 1:(length(na_22)/2)){
+        observed_points_final=c(observed_points_final,
+                                range(observed_points[(where_diff[aux_diff]+1):where_diff[aux_diff+1]]))
+        
+        
+      }}
+        
+      observed_points_last=range(observed_points[(where_diff[length(where_diff)]+1):length(observed_points)])
+        
+      observed_points_group=c(observed_points_1, observed_points_final, observed_points_last)
+      }else{
+        
+        observed_points_group=range(observed_points)
+        
+      }
+      
+      
+      ###########
+      
+      where_diff_na_22=which(diff(na_22) !=1)
+
+      if (!isempty(where_diff_na_22)) {
+      
+      na_22_final=NULL
+      
+      na_22_1=range(na_22[1:(where_diff_na_22[1])])
+      na_22_1[2]=na_22_1[2]+1
+      
+      if (na_22[1]!=1) {
+        na_22_1[1]=na_22_1[1]-1
+      }
+      
+      if (length(where_diff_na_22)>1) {
+        
+        for (aux_diff in seq(length(where_diff_na_22)-1)) {
           
-          na_x=c(na_x,which(x>=x_observations[na_22[(2*tag_x-1)]] & x<=x_observations[na_22[2*tag_x]]))
+          aux=range(na_22[(where_diff_na_22[aux_diff]+1):where_diff_na_22[aux_diff+1]])
+          aux[1]=aux[1]-1
+          aux[2]=aux[2]+1
+          
+          na_22_final=c(na_22_final,aux)
+          
+          
+        }}
+      
+      na_22_last=c(na_22[length(na_22)]-1,na_22[length(na_22)])
+      
+      if (na_22[length(na_22)]!=nrow(Real_X[[ind]][[j]])) {
+        na_22_last[length(na_22_last)]=na_22_last[length(na_22_last)]+1
+      }
+      
+      na_22_group=c(na_22_1, na_22_final, na_22_last)
+      }else{
+        
+        na_22_group=range(na_22)
+        
+        if (na_22_group[2]!=nrow(Real_X[[ind]][[j]])) {
+          na_22_group[2]=na_22_group[2]+1
         }
         
+        if (na_22_group[1]!=1) {
+          na_22_group[1]=na_22_group[1]-1
+        }
         
-        W_delta[((n+1)*(int_i-1)+1):((n+1)*int_i)][na_x]=0
       }
+      
+      
+     for(tag_x in 1:(length(na_22_group)/2)){
+        
+        na_x=c(na_x,which(x>=x_observations[na_22_group[(2*tag_x-1)]] & x<=x_observations[na_22_group[2*tag_x]]))
+      }
+      
+      W_delta[((n+1)*(int_i-1)+1):((n+1)*int_i)][na_x]=0
+      
     } # for in int_i
     
     W=invvec(W_delta, ncol = m+1, nrow = n+1)
