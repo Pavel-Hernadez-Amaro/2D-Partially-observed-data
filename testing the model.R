@@ -22,7 +22,7 @@ library(gridExtra)
 library(MASS)
 
 R=1
-N=100
+N=50
 
 err_mean=err=temp=array(0,dim=c(R,N))
 
@@ -32,14 +32,14 @@ d1=8
 d2=8
 
 c1=25
-c2=25
+c2=26
 
-c1_beta=75
-c2_beta=75
+c1_beta=50
+c2_beta=51
 
 bdeg=c(3,3)
 
-sub=1000
+sub=100
 n=2*sub # THIS IS THE NUMBER OF INTERVALS FOR THE SIMPSON METHOD
 m=2*sub
 
@@ -129,80 +129,54 @@ for (ind in 1:R) {
   # dim(aux_GLAM)=c(c1,c1_beta,c2,c2_beta)
   # aux_GLAM_apperm=matrix(aperm(aux_GLAM,c(1,3,2,4)),nrow = c1*c2)
 
-  ######## GENERATING THE TWO DIMENSIONAL BASIS USING bifd AND THE FUNCTIONAL COEFFICIENT
-
-  # CREATING THE FUNCTIONAL COEFFICIENT
+  ################## CREATING THE FUNCTIONAL COEFFICIENT
 
   # Beta_2d[[ind]]=Beta_fun(x_observations, y_observations)
   
   Beta_2d[[ind]]=Beta_H(x_observations, y_observations)
-
-  ######## GENERATING THE TWO DIMENSIONAL BASIS USING THE Harold's TESIS
-  epsilon_1=0.2
-  epsilon_2=0.2
-  epsilon_data=0.2
-  
-  # for (j in 1:N) {
-  # 
-  # aux=matrix(nrow = x_b, ncol = y_b)
-  #   
-  # for (i in 1:x_b) {
-  #   for (h in 1:y_b) {
-  #     
-  #     a1=rnorm(1,0,epsilon_1)
-  #     a2=rnorm(1,0,epsilon_2)
-  #     
-  #     aux[i,h] = a1*cos(2*pi*x_observations[i]) + a2*cos(2*pi*y_observations[h]) + 1 + rnorm(1,0,epsilon_data)
-  #     
-  #   }
-  # }
-  # 
-  # 
-  # Real_X[[ind]][[j]]=aux
-  # 
-  # nu[ind,j]=sum(Real_X[[ind]][[j]]*Beta_2d[[ind]])/(length(x_observations)+length(y_observations))
-  # }
-  
   
   ######## GENERATING THE TWO DIMENSIONAL BASIS USING bifd 
   
-  breaks_x=bspline(x_observations, x_observations[1]-1e-04, x_observations[x_b]+1e-04, d1-3, 3)$knots
-  breaks_y=bspline(y_observations, y_observations[1]-1e-04, y_observations[y_b]+1e-04, d2-3, 3)$knots
-  
-  dife=diff(breaks_x)[1]
-  breaks_x=c(breaks_x[1]-dife,breaks_x, breaks_x[length(breaks_x)]+dife)
-  breaks_x=c(breaks_x[1]-dife,breaks_x, breaks_x[length(breaks_x)]+dife)
-  n_x=length(breaks_x)
-  
-  dife=diff(breaks_y)[1]
-  breaks_y=c(breaks_y[1]-dife,breaks_y, breaks_y[length(breaks_y)]+dife)
-  breaks_y=c(breaks_y[1]-dife,breaks_y, breaks_y[length(breaks_y)]+dife)
-  n_y=length(breaks_y)
-  
-  x_basis=create.bspline.basis(breaks=breaks_x,norder=bdeg[1]+1,dropin=c(1:5,(n_x-2):(n_x+2)))
-  y_basis=create.bspline.basis(breaks=breaks_y,norder=bdeg[1]+1,dropin=c(1:5,(n_y-2):(n_y+2)))
+  # breaks_x=bspline(x_observations, x_observations[1]-1e-04, x_observations[x_b]+1e-04, d1-3, 3)$knots
+  # breaks_y=bspline(y_observations, y_observations[1]-1e-04, y_observations[y_b]+1e-04, d2-3, 3)$knots
+  # 
+  # dife=diff(breaks_x)[1]
+  # breaks_x=c(breaks_x[1]-dife,breaks_x, breaks_x[length(breaks_x)]+dife)
+  # breaks_x=c(breaks_x[1]-dife,breaks_x, breaks_x[length(breaks_x)]+dife)
+  # n_x=length(breaks_x)
+  # 
+  # dife=diff(breaks_y)[1]
+  # breaks_y=c(breaks_y[1]-dife,breaks_y, breaks_y[length(breaks_y)]+dife)
+  # breaks_y=c(breaks_y[1]-dife,breaks_y, breaks_y[length(breaks_y)]+dife)
+  # n_y=length(breaks_y)
+  # 
+  # x_basis=create.bspline.basis(breaks=breaks_x,norder=bdeg[1]+1,dropin=c(1:5,(n_x-2):(n_x+2)))
+  # y_basis=create.bspline.basis(breaks=breaks_y,norder=bdeg[1]+1,dropin=c(1:5,(n_y-2):(n_y+2)))
   
   for (j in 1:N) {
     
-    coef_xy=matrix(0,nrow = x_basis$nbasis, ncol=y_basis$nbasis)
-    
-    coef_short=matrix(rnorm(d1*d2), nrow = d1, ncol = d2)
-    
-    coef_xy[(length(x_basis$dropind)/2)+1:d1,(length(y_basis$dropind)/2)+1:d2] =coef_short 
-    
-    X_bifd=bifd(coef_xy, x_basis, y_basis)
-    
-    # coef_xy=matrix(rnorm(d1*d2),nrow = d1, ncol = d2)
-    X_bifd$coefs=coef_short
-    
-    Real_X[[ind]][[j]]=eval.bifd(x_observations, y_observations, X_bifd) # sbasismat %*% coef %*% t(tbasismat)
+    # coef_xy=matrix(0,nrow = x_basis$nbasis, ncol=y_basis$nbasis)
+    # 
+    # coef_short=matrix(rnorm(d1*d2), nrow = d1, ncol = d2)
+    # 
+    # coef_xy[(length(x_basis$dropind)/2)+1:d1,(length(y_basis$dropind)/2)+1:d2] =coef_short 
+    # 
+    # X_bifd=bifd(coef_xy, x_basis, y_basis)
+    # 
+    # # coef_xy=matrix(rnorm(d1*d2),nrow = d1, ncol = d2)
+    # X_bifd$coefs=coef_short
+    # 
+    # Real_X[[ind]][[j]]=eval.bifd(x_observations, y_observations, X_bifd) # sbasismat %*% coef %*% t(tbasismat)
     
     # Real_X[[ind]][[j]]=matrix((as.matrix(coef_x*exp(-((observation_points[,1])/10)-((observation_points[,2])/10)))),
     #                           nrow=x_b, ncol = y_b)
     
-    # nu[ind,j]=sum(Real_X[[ind]][[j]]*Beta_2d[[ind]])/(length(x_observations)+length(y_observations))
+    # nu[ind,j]= response_int_bifd(X_bifd,Beta_H, x_observations, y_observations)
     
-    nu[ind,j]= response_int_bifd(X_bifd,Beta_H, x_observations, y_observations)
+    Real_X[[ind]][[j]]=Data_H(x_observations, y_observations) # GENERATING THE TWO DIMENSIONAL BASIS USING
+                                                              # Harold's THESIS
+    
+    nu[ind,j]= response_int_H(Data_H,Beta_H, x_observations, y_observations)
       
       
   }
@@ -222,7 +196,7 @@ for (ind in 1:R) {
   knots_y=aux_2_model_k$knots
   
   fx=spline.des(knots_x, x, 3+1, 0*x)$design
-  fy=spline.des(knots_y, x, 3+1, 0*x)$design
+  fy=spline.des(knots_y, y, 3+1, 0*y)$design
   
   aux_model=aux_model_k$B
   aux_2_model=aux_2_model_k$B
@@ -237,7 +211,7 @@ for (ind in 1:R) {
   knots_x_beta=aux_model_beta$knots
   knots_y_beta=aux_2_model_beta$knots
   
-  fx_beta=spline.des(knots_x_beta, y, 3+1, 0*y)$design
+  fx_beta=spline.des(knots_x_beta, x, 3+1, 0*x)$design
   fy_beta=spline.des(knots_y_beta, y, 3+1, 0*y)$design
   
   for (j in 1:N) {
@@ -283,12 +257,6 @@ for (ind in 1:R) {
     dim(aux_GLAM)=c(c1,c1_beta,c2,c2_beta)
     aux_GLAM_apperm=matrix(aperm(aux_GLAM,c(1,3,2,4)),nrow = c1*c2)
     
-    # all.equal(aux,t(aux_GLAM))
-    
-    # all.equal(Inner_matrix_WO[(c1*c2*(j-1)+1):(c1*c2*j),],(aux_apperm))
-    # all.equal(Inner_matrix_WO[(c1*c2*(j-1)+1):(c1*c2*j),],(aux_GLAM_apperm))
-    
-    
     Inner_matrix[(c1*c2*(j-1)+1):(c1*c2*j),]=aux_GLAM_apperm
     
     
@@ -300,11 +268,20 @@ for (ind in 1:R) {
   # WO=diag(W_delta)
   # 
   # aux_product=t(I_x) %*% WO %*% I_beta
-  # 
+
+  # dim(aux_GLAM)
+  # dim(aux_GLAM_apperm)
+  # dim(aux_product)
+  # all.equal(aux_GLAM_apperm, aux_GLAM)
+  # all.equal(aux_GLAM_apperm, aux_product)
+
   # for (aux_j in 1:N) {
   #   Inner_matrix_WO[(c1*c2*(aux_j-1)+1):(c1*c2*aux_j),]=aux_product
   # }
-  # 
+  
+  # all.equal(Inner_matrix_WO[(c1*c2*(j-1)+1):(c1*c2*j),],(aux_apperm))
+  # all.equal(Inner_matrix_WO[(c1*c2*(j-1)+1):(c1*c2*j),],(aux_GLAM_apperm))
+  
   aux_B[[ind]]=B2XZG(A[,,ind]%*%Inner_matrix, pord = c(2,2), c = c(c1_beta,c2_beta))
   
   model[[ind]]=XZG2theta(X = aux_B[[ind]]$X,Z = aux_B[[ind]]$Z,G = aux_B[[ind]]$G, T = aux_B[[ind]]$T,y=response[ind,], family = gaussian() )
@@ -322,7 +299,7 @@ for (ind in 1:R) {
 
 # all.equal(Inner_matrix_WO,Inner_matrix)
 
-case=2
+case=1
 
 plot_ly(z = (Real_X[[ind]][[case]]),type="surface")
 

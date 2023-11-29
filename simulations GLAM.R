@@ -249,7 +249,7 @@ for (ind in 1:R) {
   knots_y=aux_2_model_k$knots
   
   fx=spline.des(knots_x, x, 3+1, 0*x)$design
-  fy=spline.des(knots_y, x, 3+1, 0*x)$design
+  fy=spline.des(knots_y, y, 3+1, 0*y)$design
   
   aux_model=aux_model_k$B
   aux_2_model=aux_2_model_k$B
@@ -264,7 +264,7 @@ for (ind in 1:R) {
   knots_x_beta=aux_model_beta$knots
   knots_y_beta=aux_2_model_beta$knots
   
-  fx_beta=spline.des(knots_x_beta, y, 3+1, 0*y)$design
+  fx_beta=spline.des(knots_x_beta, x, 3+1, 0*x)$design
   fy_beta=spline.des(knots_y_beta, y, 3+1, 0*y)$design
   
   W_x=(HX/3)*Sim_w_x
@@ -438,6 +438,8 @@ for (ind in 1:R) {
       na_22_group=c(na_22_1, na_22_final, na_22_last)
       }else{
         
+        if (!isempty(na_22)) {
+          
         na_22_group=range(na_22)
         
         if (na_22_group[2]!=nrow(Real_X[[ind]][[j]])) {
@@ -448,8 +450,13 @@ for (ind in 1:R) {
           na_22_group[1]=na_22_group[1]-1
         }
         
-      }
+        }else{
+          
+          na_22_group=NULL
+          }
+        }
       
+      if (!is.null(na_22_group)) {
       
      for(tag_x in 1:(length(na_22_group)/2)){
         
@@ -457,6 +464,8 @@ for (ind in 1:R) {
       }
       
       W_delta[((n+1)*(int_i-1)+1):((n+1)*int_i)][na_x]=0
+      
+      }
       
     } # for in int_i
     
@@ -489,7 +498,7 @@ for (ind in 1:R) {
   
 } # for in ind
 
-case=1
+case=19
 
 plot_ly(z = (Real_X[[ind]][[case]]),type="surface")
 
