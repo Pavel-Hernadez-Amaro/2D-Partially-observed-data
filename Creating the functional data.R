@@ -57,7 +57,7 @@ Real_X[[ind]][[j]]=matrix(as.matrix(coef_x*(sin((observation_points[,1])^2/100)*
 
 ########################
 
-Data_H=function(x_observations, y_observations, epsilon_1=0.2, epsilon_2=0.2, epsilon_data=0){
+Data_H=function(x_observations, y_observations, epsilon_1=0.2, epsilon_2=0.2, epsilon_data=0.005){
 
 x_b=length(x_observations)
 y_b=length(y_observations)
@@ -79,7 +79,7 @@ DATA
 
 }
 
-data_example=Data_H(x_observations, y_observations, epsilon_1 = 0.2, epsilon_2 = 0.2, epsilon_data = 0)
+data_example=Data_H(x_observations, y_observations, epsilon_1 = 0.2, epsilon_2 = 0.2, epsilon_data = 0.005)
 
 plot_ly(z = data_example, type="surface")
 

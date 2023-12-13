@@ -109,33 +109,33 @@ for (ind in 1:R) {
   
   breaks_x=bspline(x_observations, x_observations[1]-1e-04, x_observations[x_b]+1e-04, d1-3, 3)$knots
   breaks_y=bspline(y_observations, y_observations[1]-1e-04, y_observations[y_b]+1e-04, d2-3, 3)$knots
-  
+
   dife=diff(breaks_x)[1]
   breaks_x=c(breaks_x[1]-dife,breaks_x, breaks_x[length(breaks_x)]+dife)
   breaks_x=c(breaks_x[1]-dife,breaks_x, breaks_x[length(breaks_x)]+dife)
   n_x=length(breaks_x)
-  
+
   dife=diff(breaks_y)[1]
   breaks_y=c(breaks_y[1]-dife,breaks_y, breaks_y[length(breaks_y)]+dife)
   breaks_y=c(breaks_y[1]-dife,breaks_y, breaks_y[length(breaks_y)]+dife)
   n_y=length(breaks_y)
-  
+
   x_basis=create.bspline.basis(breaks=breaks_x,norder=bdeg[1]+1,dropin=c(1:5,(n_x-2):(n_x+2)))
   y_basis=create.bspline.basis(breaks=breaks_y,norder=bdeg[1]+1,dropin=c(1:5,(n_y-2):(n_y+2)))
   
   for (j in 1:N) {
     
     coef_xy=matrix(0,nrow = x_basis$nbasis, ncol=y_basis$nbasis)
-    
+
     coef_short=matrix(rnorm(d1*d2), nrow = d1, ncol = d2)
-    
-    coef_xy[(length(x_basis$dropind)/2)+1:d1,(length(y_basis$dropind)/2)+1:d2] =coef_short 
-    
+
+    coef_xy[(length(x_basis$dropind)/2)+1:d1,(length(y_basis$dropind)/2)+1:d2] =coef_short
+
     X_bifd=bifd(coef_xy, x_basis, y_basis)
-    
+
     # coef_xy=matrix(rnorm(d1*d2),nrow = d1, ncol = d2)
     X_bifd$coefs=coef_short
-    
+
     Real_X[[ind]][[j]]=eval.bifd(x_observations, y_observations, X_bifd) # sbasismat %*% coef %*% t(tbasismat)
     
     # Real_X[[ind]][[j]]=matrix((as.matrix(coef_x*exp(-((observation_points[,1])/10)-((observation_points[,2])/10)))),
@@ -145,9 +145,15 @@ for (ind in 1:R) {
     
     nu[ind,j] = response_int_bifd(X_bifd,Beta_H, x_observations, y_observations)
     
+    
+    # Real_X[[ind]][[j]]=Data_H(x_observations, y_observations) # GENERATING THE TWO DIMENSIONAL BASIS USING
+                                                              # # Harold's THESIS
+    # 
+    # nu[ind,j]= response_int_H(Data_H,Beta_H, x_observations, y_observations)
+    
     ######## MISSING FROM BORDERS AND INSIDE (CLOUD VERSION)
     
-    n_missing=sample(2:8,1)
+    n_missing=sample(2:3,1)
     
     x_missing=sort(sample(x_observations,n_missing))
     y_missing=sort(sample(y_observations,n_missing))
@@ -498,7 +504,7 @@ for (ind in 1:R) {
   
 } # for in ind
 
-case=19
+case=j
 
 plot_ly(z = (Real_X[[ind]][[case]]),type="surface")
 

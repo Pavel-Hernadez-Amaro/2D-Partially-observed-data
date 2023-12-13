@@ -71,31 +71,35 @@ plot_ly(z = Beta_spline,type="surface")
 
 #######
 
-Beta_H=function(x_observations,y_observations,case=1){
+Beta_H_saddle=function(x_observations,y_observations){
   
   aux_beta=matrix(nrow = length(x_observations), ncol = length(y_observations))
   
   for (i in 1:length(x_observations)) {
     for (h in 1:length(y_observations)) {
-      
-      if (case==2) {
-        
-        aux_beta[i,h] = 5*exp(-8*((x_observations[i]-0.75)^2 + (y_observations[h] -0.75)^2)) + 5*exp(-8*((x_observations[i]-0.1)^2 + (y_observations[h] -0.1)^2))
-      }else{
-
         aux_beta[i,h] = (4*x_observations[i]-2)^3 -3*(4*x_observations[i]-2)*(4*y_observations[h]-2)^2
-        
-      }
-      
-      
-      
     }
   }
-  aux_beta
+  aux_beta/10
   }
+
+plot_ly(z = Beta_H_saddle(x_observations,y_observations),type="surface")
+
+Beta_H_exp=function(x_observations,y_observations){
+  
+  aux_beta=matrix(nrow = length(x_observations), ncol = length(y_observations))
+  
+  for (i in 1:length(x_observations)) {
+    for (h in 1:length(y_observations)) {
+      aux_beta[i,h] = 5*exp(-8*((x_observations[i]-0.75)^2 + (y_observations[h] -0.75)^2)) + 5*exp(-8*((x_observations[i]-0.1)^2 + (y_observations[h] -0.1)^2))
+    }
+  }
+  aux_beta/10
+}
 
 # aux_beta=matrix(nrow = x_b, ncol = y_b)
 
+plot_ly(z = Beta_H_exp(x_observations,y_observations),type="surface")
 
 
 
