@@ -57,12 +57,12 @@ Real_X[[ind]][[j]]=matrix(as.matrix(coef_x*(sin((observation_points[,1])^2/100)*
 
 ########################
 
-Data_H=function(x_observations, y_observations, epsilon_1=0.2, epsilon_2=0.2, epsilon_data=0.005){
+Data_H=function(x_observations, y_observations, epsilon_1=0.2, epsilon_2=0.2, epsilon_data=0.05){
 
 x_b=length(x_observations)
 y_b=length(y_observations)
 
-DATA=matrix(nrow = x_b, ncol=y_b)
+DATA_T=DATA_N=matrix(nrow = x_b, ncol=y_b)
 
 a1=rnorm(1,0,epsilon_1)
 a2=rnorm(1,0,epsilon_2)
@@ -71,15 +71,23 @@ for (i in 1:x_b) {
   for (j in 1:y_b) {
 
     
-    DATA[i,j] = a1*cos(2*pi*x_observations[i]) + a2*cos(2*pi*y_observations[j]) + 1 + rnorm(1,0,epsilon_data)
+    DATA_T[i,j] = a1*cos(2*pi*x_observations[i]) + a2*cos(2*pi*y_observations[j]) + 1 
+    DATA_N[i,j]= DATA_T[i,j] + rnorm(1,0,epsilon_data)
   }
 }
 
-DATA
+DATA=data.frame(DATA_T[,1])
+
+DATA[["DATA_T"]]=DATA_T
+DATA[["DATA_N"]]=DATA_N
+
+DATA=DATA[,-1]
 
 }
 
-data_example=Data_H(x_observations, y_observations, epsilon_1 = 0.2, epsilon_2 = 0.2, epsilon_data = 0.005)
+data_example=Data_H(x_observations, y_observations, epsilon_1 = 0.2, epsilon_2 = 0.2, epsilon_data = 0.05)
 
-plot_ly(z = data_example, type="surface")
+data_example$DATA_N
+
+plot_ly(z = data_example$DATA_T, type="surface")
 

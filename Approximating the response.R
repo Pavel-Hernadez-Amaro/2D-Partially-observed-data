@@ -58,7 +58,7 @@ response_int_bifd=function(f_X,f_Beta, x_observations, y_observations, sub_respo
   
 }
 
-response_int_H=function(f_X,f_Beta, x_observations, y_observations, sub_response=50){
+response_int_H=function(f_X,f_Beta, x_observations, y_observations, sub_response=50, N=TRUE){
   
   n_y=m_y=2*sub_response
   
@@ -106,7 +106,12 @@ response_int_H=function(f_X,f_Beta, x_observations, y_observations, sub_response
     
   }
   
-  X_eval=f_X(x, y)
+  if (N) {
+    X_eval=f_X(x,y)$DATA_N    
+  }else{
+    X_eval=f_X(x,y)$DATA_T
+  }
+
   
   Beta_eval=f_Beta(x, y)
   
