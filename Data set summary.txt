@@ -1,0 +1,24 @@
+The data set is the 1st of the one we have seen:
+
+DATASET 1:  air quality classifier from photos
+
+https://github.com/nileshparab42/Air-Pollution-Classification/blob/main/README.md
+
+IND_and_NEP: This subfolder contains six different subfolders representing six different classes of AQI (nos quedaríamos con 2 clases). The csv file in this folder contains all the data and its parameters. It is labeled as
+
+Location, Filename, Year, Month, Day, Hour, AQI, PM2.5, PM10, O3, CO, SO2, NO2, and AQI_Class.
+
+The link for the data set is: https://www.kaggle.com/datasets/adarshrouniyar/air-pollution-image-dataset-from-india-and-nepal
+
+
+You will see all this in the R code but here is a short summary of the data set we are using and our procedure:
+
+We are focusing on the region of "Dimapur". This region only have two classification "b_Moderate" "c_Unhealthy_for_Sensitive_Groups"
+
+That is why I am focusing on this particular region.
+
+On this region we have 350 pictures of 224x224 pixel we are using 60x220 on some cases I have extended to 70x220.
+
+I think I have also tried with 70x200. In my computer when I try to use the entire picture it gives me storage errors.
+
+I add one gap of a specific size in every image. The size of the gap is linked with the errors.
